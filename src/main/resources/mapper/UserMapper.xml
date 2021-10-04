@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.UserMapper">
+    <!--根据用户的userid查出此用户-->
+    <select id="selectById" resultType="com.example.domain.User" parameterType="String">
+        select u.userId,u.userName,u.password,u.userRemarks from sys_user as u where u.userId=#{userId}
+    </select>
+
+    <!--注册新用户-->
+    <insert id="insertUser" parameterType="com.example.domain.User">
+        insert  into sys_user
+        (userId,userName,password,userRemarks)
+        VALUES
+        (#{user.userId},#{user.userName},#{user.password},#{user.userRemarks})
+    </insert>
+
+    <!--根据用户的userName查询出此用户-->
+    <select id="selectByName" parameterType="String" resultType="com.example.domain.User">
+        select u.userId,u.userName,u.password,u.userRemarks from sys_user as u where u.userName=#{userName}
+    </select>
+
+
+    <!--根据用户的userId查询出其对应的角色以及角色相关的所有权限-->
+    <select id="selectUserPermissionById" parameterType="String" resultType="java.util.LinkedHashMap">
+
+        SELECT u.userId,u.userName,u.password,u.userRemarks,
+               r.roleName,
+               r.roleRemarks,
+               GROUP_CONCAT(p.permissionsName)permissionsNameList,
+               GROUP_CONCAT(p.perRemarks)perRemarksList
+        FROM
+            sys_user u,sys_role r,sys_permissions p,user_role ur,role_per rp
+        WHERE
+            u.userId=ur.userId AND
+            ur.roleId=r.roleId AND
+            r.roleId=rp.roleId AND
+            rp.perId=p.perId   AND
+            u.userId=#{userId}
+        GROUP BY u.id
+    </select>
+
+
+    <!--根据用户的userName查询出其对应的角色以及角色相关的所有权限-->
+    <select id="selectUserPermissionByName" parameterType="String" resultType="java.util.LinkedHashMap">
+        SELECT u.userId,u.userName,u.password,u.userRemarks,
+               r.roleName,
+               r.roleRemarks,
+               GROUP_CONCAT(p.permissionsName)permissionsNameList,
+               GROUP_CONCAT(p.perRemarks)perRemarksList
+        FROM
+            sys_user u,sys_role r,sys_permissions p,user_role ur,role_per rp
+        WHERE
+            u.userId=ur.userId AND
+            ur.roleId=r.roleId AND
+            r.roleId=rp.roleId AND
+            rp.perId=p.perId   AND
+            u.userName=#{userName}
+        GROUP BY u.id
+    </select>
+
+</mapper>
